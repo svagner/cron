@@ -370,6 +370,7 @@ get_included_files(new_db, old_db, statbuf)
 	    Debug(DLOAD, ("\t[%d] %s: Found #include: %s\n", getpid(), __FUNCTION__, param));
 	    if (stat(SYSCRONTAB, statbuf) < OK)
 		    statbuf->st_mtime = 0;
+	    break;
     }
     fclose(syscrontab);
 
