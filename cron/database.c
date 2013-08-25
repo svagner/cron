@@ -352,7 +352,7 @@ get_included_files(new_db, old_db, statbuf)
 
     /* track system included crontab file
     */
-    Debug(DLOAD, ("Finding includes in %s\n", SYSCRONTAB));
+    Debug(DLOAD, ("\t[%d] %s: Finding includes in %s\n", getpid(), __FUNCTION__, SYSCRONTAB));
     syscrontab = fopen(SYSCRONTAB, "r");
     while(fgets(crontabline, MAX_COMMAND, syscrontab))
     {
@@ -367,7 +367,7 @@ get_included_files(new_db, old_db, statbuf)
 		    log_it("CRON", getpid(), "Include directives not correct", SYSCRONTAB);
 		    break;
 	    }
-	    Debug(DLOAD, ("Found #include: %s\n", param));
+	    Debug(DLOAD, ("\t[%d] %s: Found #include: %s\n", getpid(), __FUNCTION__, param));
 	    if (stat(SYSCRONTAB, statbuf) < OK)
 		    statbuf->st_mtime = 0;
     }
@@ -375,7 +375,7 @@ get_included_files(new_db, old_db, statbuf)
 
     if (!param)
     {
-	Debug(DLOAD, ("Include directive not find in crontab\n"));
+	Debug(DLOAD, ("\t[%d] %s: Include directive not find in crontab\n", getpid(), __FUNCTION__));
 	return;
     }
 
@@ -404,11 +404,11 @@ get_included_files(new_db, old_db, statbuf)
 		}
 		if (!(statbuf->st_mode & S_IFREG))
 		{
-		    Debug(DLOAD, ("File for include is not regular %s. Return %d\n", param, statbuf->st_mode));
+		    Debug(DLOAD, ("\t[%d] %s: File for include is not regular %s. Return %d\n", getpid(), __FUNCTION__, param, statbuf->st_mode));
 		    return;	
 		}
 		new_db->mtime = TMAX(statbuf->st_mtime, new_db->mtime);
-		Debug(DLOAD, ("Processing included crontab: %s\n", param));
+		Debug(DLOAD, ("\t[%d] %s: Processing included crontab: %s\n", getpid(), __FUNCTION__, param));
 		process_crontab("root", SYS_INCLUDE,
 		param, statbuf,
 		new_db, old_db);
@@ -424,7 +424,7 @@ get_included_files(new_db, old_db, statbuf)
 	log_it("get_included_files(): ", getpid(), "can't find include file", param);
 	return;
     }
-    Debug(DLOAD, ("Found: %d files for include\n", n));
+    Debug(DLOAD, ("\t[%d] %s: Found: %d files for include\n", getpid(), __FUNCTION__, n));
     while(n--)
     {
 	bzero(fullpath, MAX_INCLUDENAME);
@@ -437,12 +437,12 @@ get_included_files(new_db, old_db, statbuf)
 	}
 	if (!(filestat.st_mode & S_IFREG))
 	{
-	    Debug(DLOAD, ("File for include is not regular %s. Return %d\n", fullpath, filestat.st_mode));
+	    Debug(DLOAD, ("\t[%d] %s: File for include is not regular %s. Return %d\n", getpid(), __FUNCTION__, fullpath, filestat.st_mode));
 	    continue;	
 	}
 	statbuf->st_mtime = TMAX(statbuf->st_mtime, filestat.st_mtime);
 	new_db->mtime = TMAX(statbuf->st_mtime, new_db->mtime);
-	Debug(DLOAD, ("Processing included crontab: %s\n", fullpath));
+	Debug(DLOAD, ("\t[%d] %s: Processing included crontab: %s\n", getpid(), __FUNCTION__, fullpath));
 	process_crontab("root", SYS_INCLUDE,
 	    fullpath, statbuf,
 	    new_db, old_db);
