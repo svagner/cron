@@ -2,4 +2,4 @@
 
 LIBCRON= ${.OBJDIR}/../lib/libcron.a
 
-.include "../Makefile.inc"
+.include "./Makefile_usr_sbin.inc"

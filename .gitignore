@@ -18,3 +18,7 @@
 
 # vim temporary files
 *~
+
+# Binary files
+cron/cron
+crontab/crontab

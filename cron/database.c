@@ -402,6 +402,11 @@ get_included_files(new_db, old_db, statbuf)
 		    log_it("CRON", getpid(), "STAT FAILED", param);
 		    statbuf->st_mtime = 0;
 		}
+		if (!(statbuf->st_mode & S_IFREG))
+		{
+		    Debug(DLOAD, ("File for include is not regular %s. Return %d\n", param, statbuf->st_mode));
+		    return;	
+		}
 		new_db->mtime = TMAX(statbuf->st_mtime, new_db->mtime);
 		Debug(DLOAD, ("Processing included crontab: %s\n", param));
 		process_crontab("root", SYS_INCLUDE,
@@ -455,11 +460,17 @@ find_in_dir(const struct dirent *d)
 	int	origdlen;
 	int	secondlen;
 	char	mask[MAX_INCLUDENAME];
+	char	base[MAX_INCLUDENAME];
 
 	bzero(mask, MAX_INCLUDENAME);
+	bzero(base, MAX_INCLUDENAME);
 	strcpy(mask, basename(includemask));
+	strcpy(base, basename(includemask));
 
 	if ( !strcmp(".", d->d_name) || !strcmp("..", d->d_name)) return 0;
+	if (strlen(base) == 1 && base[0] == '*')
+		return 1;
+
 	first = strtok(mask, delim);
 	second = strtok(NULL, delim);
 	origdlen = strlen(d->d_name);
@@ -471,7 +482,11 @@ find_in_dir(const struct dirent *d)
 		return 1;
 	}
 	else
-	    if (!strncmp(first, d->d_name+(origdlen-strlen(first)), strlen(first)))
+	{
+	    if (base[0] == '*' && !strncmp(first, d->d_name+(origdlen-strlen(first)), strlen(first)))
 		return 1;
+	    if (base[0] != '*' && !strncmp(first, d->d_name, strlen(first)))
+		return 1;
+	}   
 	return 0;
 };
