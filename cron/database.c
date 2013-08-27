@@ -357,6 +357,8 @@ get_included_files(new_db, old_db, statbuf)
     while(fgets(crontabline, MAX_COMMAND, syscrontab))
     {
 	    value = strtok(crontabline, delim);
+	    if (!value)
+		    continue;
 	    if (strcmp(value,INCLUDECRON))
 		    continue;
 	    param = strtok(NULL, delim);
